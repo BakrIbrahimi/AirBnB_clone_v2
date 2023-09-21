@@ -1,19 +1,19 @@
 #!/usr/bin/python3
-""" """
+""" document documt """
 from tests.test_models.test_base_model import test_basemodel
 from models.amenity import Amenity
-import os
+
 
 class test_Amenity(test_basemodel):
-    """amanity test class """
+    """ document documt """
 
     def __init__(self, *args, **kwargs):
-        """init thhe tst class """
+        """ document documt """
         super().__init__(*args, **kwargs)
         self.name = "Amenity"
         self.value = Amenity
 
     def test_name2(self):
-        """testing name type """
+        """ document documt """
         new = self.value()
         self.assertEqual(type(new.name), str)

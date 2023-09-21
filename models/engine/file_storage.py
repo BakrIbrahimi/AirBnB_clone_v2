@@ -8,12 +8,33 @@ class FileStorage:
     __file_path = 'file.json'
     __objects = {}
 
+    @property
+    def cities(self):
+        """Retruns Cities in state"""
+
+    def delete(self, obj=None):
+        """loop through __objects, compare each value
+        of key with cls argument wich is object
+        """
+        if obj:
+            id = obj.to_dict()["id"]
+            className = obj.to_dict()["__class__"]
+            keyName = className+"."+id
+            if keyName in FileStorage.__objects:
+                del (FileStorage.__objects[keyName])
+                self.save()
+
     def all(self, cls=None):
-        """Returns a dictionary of instances of a class currently in storage"""
-        if (cls):
-            return {k: v for k,v in FileStorage.__objects.items() 
-                    if type(v) == cls}
-        return FileStorage.__objects
+        """Returns a dictionary of models currently in storage"""
+        print_dict = {}
+        if cls:
+            className = cls.__name__
+            for k, v in FileStorage.__objects.items():
+                if k.split('.')[0] == className:
+                    print_dict[k] = str(v)
+            return print_dict
+        else:
+            return FileStorage.__objects
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -26,14 +47,8 @@ class FileStorage:
             temp.update(FileStorage.__objects)
             for key, val in temp.items():
                 temp[key] = val.to_dict()
-            json.dump(temp, f, indent=4)
+            json.dump(temp, f)
 
-    def delete(self, obj=None):
-        """Deletes an object from storage"""
-        if (obj and f"{obj.__class__.__name__}.{obj.id}" in self.all().keys()):
-            k = f"{obj.__class__.__name__}.{obj.id}"
-            self.all().pop(k)            
-        
     def reload(self):
         """Loads storage dictionary from file"""
         from models.base_model import BaseModel
@@ -43,7 +58,6 @@ class FileStorage:
         from models.city import City
         from models.amenity import Amenity
         from models.review import Review
-
         classes = {
                     'BaseModel': BaseModel, 'User': User, 'Place': Place,
                     'State': State, 'City': City, 'Amenity': Amenity,
@@ -54,6 +68,6 @@ class FileStorage:
             with open(FileStorage.__file_path, 'r') as f:
                 temp = json.load(f)
                 for key, val in temp.items():
-                        self.all()[key] = classes[val['__class__']](**val)
+                    self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
